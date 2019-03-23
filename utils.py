@@ -1,6 +1,7 @@
 import torch
 import os
-
+import random
+from collections import namedtuple
 
 def create_folder(directory):
     try:
@@ -27,3 +28,27 @@ def load_weights(policy, discriminator, args, directory='./preTrained'):
         discriminator.load_state_dict(torch.load('{}/{}_{}_{}_discriminator.pth'.format(directory, args.algo, args.policy_name, args.env_name)))
     else:
         print("PreTrained Weights don't exists. Training Agent from scratch")
+
+
+
+
+# Taken from
+# https://github.com/pytorch/tutorials/blob/master/Reinforcement%20(Q-)Learning%20with%20PyTorch.ipynb
+
+Transition = namedtuple('Transition', ('state', 'action', 'mask', 'next_state',
+                                       'reward'))
+
+
+class Memory(object):
+    def __init__(self):
+        self.memory = []
+
+    def push(self, *args):
+        """Saves a transition."""
+        self.memory.append(Transition(*args))
+
+    def sample(self):
+        return Transition(*zip(*self.memory))
+
+    def __len__(self):
+        return len(self.memory)
